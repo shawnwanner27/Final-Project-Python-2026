@@ -36,3 +36,11 @@ teamPitchingStrikeOutPercent =
 teamPitchingWalkPercent =
 
 teamPitchingHitsPercent =
+
+teamSingles =
+
+teamDoubles = 
+
+teamTriples =
+
+teamHomeRuns =
