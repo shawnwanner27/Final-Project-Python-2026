@@ -80,6 +80,7 @@ def createTeam(league):
         return
     league.teams[name] = []
     print("Team created.")
+    print("--------------------------------------------------")
 
 
 def createPlayer(league):
@@ -93,6 +94,7 @@ def createPlayer(league):
     league.players[name] = player
     league.teams[team].append(name)
     print("Player created.")
+    print("--------------------------------------------------")
 
 
 def addGame(league):
@@ -105,6 +107,7 @@ def addGame(league):
         "playerStats": []}
 
     numPlayers = int(input("How many player entries? "))
+    print("--------------------------------------------------")
     for x in range(numPlayers):
         name = input("Player name: ").upper()
         stats = {
@@ -120,15 +123,18 @@ def addGame(league):
             "pitchingStrikes": int(input("Pitching strikes: ")),
             "pitchingBalls": int(input("Pitching balls: ")),
             "pitchingHits": int(input("Hits allowed: "))}
+        print("--------------------------------------------------")
 
         game["playerStats"].append({"name": name, **stats})
         if name in league.players:
             league.players[name].addGame(stats)
         else:
             print("Player not found.")
+            print("--------------------------------------------------")
 
     league.games.append(game)
     print("Game added.")
+    print("--------------------------------------------------")
 
 
 
@@ -193,46 +199,97 @@ def searchStats(league):
         name = input("Player name: ").upper()
         if name not in league.players:
             print("Player not found.")
+            print("--------------------------------------------------")
             return
 
         player = league.players[name]
         stat = player.getTotals()
-        print("Batting Average:", battingAvg(stat))
-        print("On Base Percent:", onBasePercent(stat))
-        print("Strikeout Percent:", strikeoutPercent(stat))
-        print("Walk Percent:", walkPercent(stat))
+        print("Batting Average:", round(battingAvg(stat),3))
+        print("On Base Percent:", round(onBasePercent(stat),3))
+        print("Strikeout Percent:", round(strikeoutPercent(stat),3))
+        print("Walk Percent:", round(walkPercent(stat),3))
         print("Singles:", stat["singles"])
         print("Doubles:", stat["doubles"])
         print("Triples:", stat["triples"])
         print("Home Runs:", stat["homeRuns"])
-        print("Pitching Strike Percent:", pitchingStrikesPercent(stat))
-        print("Pitching Walk Percent:", pitchingWalkPercent(stat))
+        print("Pitching Strike Percent:", round(pitchingStrikesPercent(stat),3))
+        print("Pitching Walk Percent:", round(pitchingWalkPercent(stat),3))
+        print("--------------------------------------------------")
 
 
     elif choice == "team":
         name = input("Team name: ").upper()
         if name not in league.teams:
             print("Team not found.")
+            print("--------------------------------------------------")
             return
 
         totals = teamTotals(league, name)
         wins, losses = teamRecord(league, name)
         print("Record:", wins, "-", losses)
         print("Win Percent:", wins / (wins + losses) if (wins + losses) else 0)
-        print("Team Batting Average:", battingAvg(totals))
-        print("Team On Base Percent:", onBasePercent(totals))
-        print("Team Strikeout Percent:", strikeoutPercent(totals))
-        print("Team Walk Percent:", walkPercent(totals))
+        print("Team Batting Average:", round(battingAvg(totals),3))
+        print("Team On Base Percent:", round(onBasePercent(totals),3))
+        print("Team Strikeout Percent:", round(strikeoutPercent(totals),3))
+        print("Team Walk Percent:", round(walkPercent(totals),3))
         print("Total Singles:", totals["singles"])
         print("Total Doubles:", totals["doubles"])
         print("Total Triples:", totals["triples"])
         print("Total Home Runs:", totals["homeRuns"])
-        print("Pitching Strike Percent:", pitchingStrikesPercent(totals))
-        print("Pitching Walk Percent:", pitchingWalkPercent(totals))
+        print("Pitching Strike Percent:", round(pitchingStrikesPercent(totals),3))
+        print("Pitching Walk Percent:", round(pitchingWalkPercent(totals),3))
+        print("--------------------------------------------------")
+
+
+def showRosters(league):
+    choice = input("Which team would you like to see? ").upper()
+    if choice not in league.teams:
+            print("Team not found.")
+            print("--------------------------------------------------")
+            return
+    for x in league.teams if choice == league.teams:
+        #####################################################################################################################
 
 
 
 
 
 
-#Add main menu and the print("--------------------------------------------------")
+def main():
+    league = League()
+
+    while True:
+        print("1. Create Team")
+        print("2. Create Player")
+        print("3. Add Game")
+        print("4. Search Stats")
+        print("5. Show Rosters")
+        print("6. Exit")
+
+        choice = input("Choose: ")
+        print("--------------------------------------------------")
+
+        if choice == "1":
+            createTeam(league)
+        elif choice == "2":
+            createPlayer(league)
+        elif choice == "3":
+            addGame(league)
+        elif choice == "4":
+            searchStats(league)
+        elif choice == "5":
+            showRosters(league)
+        elif choice == "6":
+            league.save()
+            print("Saved. Goodbye.")
+            print("--------------------------------------------------")
+            break
+        else:
+            print("Invalid choice.")
+            print("--------------------------------------------------")
+
+        league.save()
+
+
+
+main()
