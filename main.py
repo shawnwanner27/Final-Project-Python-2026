@@ -74,7 +74,7 @@ class League:
 
 
 def createTeam(league):
-    name = input("Enter team name: ").upper()
+    name = input("Enter Team Name: ").upper()
     if name in league.teams:
         print("Team already exists.")
         return
@@ -84,8 +84,8 @@ def createTeam(league):
 
 
 def createPlayer(league):
-    name = input("Enter player name: ").upper()
-    team = input("Enter team: ").upper()
+    name = input("Enter Player Name: ").upper()
+    team = input("Enter Team: ").upper()
     if team not in league.teams:
         print("Team does not exist.")
         return
@@ -100,29 +100,30 @@ def createPlayer(league):
 def addGame(league):
     game = {
         "date": input("Date (mm/dd/yyyy): "),
-        "homeTeam": input("Home team: ").upper(),
-        "awayTeam": input("Away team: ").upper(),
-        "homeScore": int(input("Home score: ")),
-        "awayScore": int(input("Away score: ")),
+        "number": input("Game Number of That Day (1st, 2nd, 3rd): "),
+        "homeTeam": input("Home Team: ").upper(),
+        "awayTeam": input("Away Team: ").upper(),
+        "homeScore": int(input("Home Score: ")),
+        "awayScore": int(input("Away Score: ")),
         "playerStats": []}
 
     numPlayers = int(input("How many player entries? "))
     print("--------------------------------------------------")
     for x in range(numPlayers):
-        name = input("Player name: ").upper()
+        name = input("Player Name: ").upper()
         stats = {
-            "atBats": int(input("At bats: ")),
+            "atBats": int(input("At Bats: ")),
             "hits": int(input("Hits: ")),
             "walks": int(input("Walks: ")),
             "strikeouts": int(input("Strikeouts: ")),
             "singles": int(input("Singles: ")),
             "doubles": int(input("Doubles: ")),
             "triples": int(input("Triples: ")),
-            "homeRuns": int(input("Home runs: ")),
-            "pitchCount": int(input("Pitch count: ")),
-            "pitchingStrikes": int(input("Pitching strikes: ")),
-            "pitchingBalls": int(input("Pitching balls: ")),
-            "pitchingHits": int(input("Hits allowed: "))}
+            "homeRuns": int(input("Home Runs: ")),
+            "pitchCount": int(input("Pitch Count: ")),
+            "pitchingStrikes": int(input("Pitching Strikes: ")),
+            "pitchingBalls": int(input("Pitching Balls: ")),
+            "pitchingHits": int(input("Hits Allowed: "))}
         print("--------------------------------------------------")
 
         game["playerStats"].append({"name": name, **stats})
@@ -190,13 +191,66 @@ def teamRecord(league, team):
 
 
 
+def editGame(league):
+    while True:
+        targetDate = input("What day was the game you would like to edit? ")
+        targetGameNumber = input("What number game was it that day? ")
+        targetGame = "x"
+
+        for game in league.games:
+            if game["date"] == targetDate and game["number"] == targetGameNumber:
+                targetGame = game
+                break
+        if targetGame is "x":
+            print("Game not found.")
+            print("--------------------------------------------------")
+            continue
+
+        print(f'{targetGame["awayTeam"]} vs {targetGame["homeTeam"]}')
+        print(f'Score: {targetGame["awayScore"]} - {targetGame["homeScore"]}')
+
+        print(targetGame["awayTeam"], "PLAYER STATS:")
+        for player in targetGame["playerStats"]:
+            if player["name"] in league.players:
+                if league.players[player["name"]].team == targetGame["awayTeam"]:
+                    print(player)
+        print("--------------------------------------------------")
+
+        print(targetGame["homeTeam"], "PLAYER STATS:")
+        for player in targetGame["playerStats"]:
+            if player["name"] in league.players:
+                if league.players[player["name"]].team == targetGame["homeTeam"]:
+                    print(player)
+        print("--------------------------------------------------")
+
+        correct = input("Is this the correct game? (yes/no): ").upper()
+        if correct == "YES":
+            break
+
+    playerName = input("Which player's stats would you like to edit? ").upper()
+    playerStats = "x"
+    for player in targetGame["playerStats"]:
+        if player["name"] == playerName:
+            playerStats = player
+            break
+    if playerStats is "x":
+        print("Player not found in this game.")
+        print("--------------------------------------------------")
+        return
+
+
+
+
+########################################################################################################################
+
+
 
 
 def searchStats(league):
     choice = input("Player or Team? ").lower()
 
     if choice == "player":
-        name = input("Player name: ").upper()
+        name = input("Player Name: ").upper()
         if name not in league.players:
             print("Player not found.")
             print("--------------------------------------------------")
@@ -218,7 +272,7 @@ def searchStats(league):
 
 
     elif choice == "team":
-        name = input("Team name: ").upper()
+        name = input("Team Name: ").upper()
         if name not in league.teams:
             print("Team not found.")
             print("--------------------------------------------------")
@@ -247,10 +301,10 @@ def showRosters(league):
             print("Team not found.")
             print("--------------------------------------------------")
             return
-    for x in league.teams if choice == league.teams:
-        #####################################################################################################################
-
-
+    print(f"{choice} ROSTER:")
+    for playerName in league.teams[choice]:
+        print(playerName)
+    print("--------------------------------------------------")
 
 
 
@@ -262,9 +316,10 @@ def main():
         print("1. Create Team")
         print("2. Create Player")
         print("3. Add Game")
-        print("4. Search Stats")
-        print("5. Show Rosters")
-        print("6. Exit")
+        print("4. Edit Game")
+        print("5. Search Stats")
+        print("6. Show Rosters")
+        print("7. Exit")
 
         choice = input("Choose: ")
         print("--------------------------------------------------")
@@ -276,10 +331,12 @@ def main():
         elif choice == "3":
             addGame(league)
         elif choice == "4":
-            searchStats(league)
+            editGame(league)
         elif choice == "5":
-            showRosters(league)
+            searchStats(league)
         elif choice == "6":
+            showRosters(league)
+        elif choice == "7":
             league.save()
             print("Saved. Goodbye.")
             print("--------------------------------------------------")
@@ -291,5 +348,5 @@ def main():
         league.save()
 
 
-
+print("--------------------------------------------------")
 main()
