@@ -198,50 +198,71 @@ def editGame(league):
         targetGame = "x"
 
         for game in league.games:
-            if game["date"] == targetDate and game["number"] == targetGameNumber:
+            if game['date'] == targetDate and game.get['number'] == targetGameNumber:
                 targetGame = game
                 break
-        if targetGame is "x":
+        if targetGame == "x":
             print("Game not found.")
             print("--------------------------------------------------")
             continue
 
-        print(f'{targetGame["awayTeam"]} vs {targetGame["homeTeam"]}')
-        print(f'Score: {targetGame["awayScore"]} - {targetGame["homeScore"]}')
+        print(f"{targetGame['awayTeam']} vs {targetGame['homeTeam']}")
+        print(f"Score: {targetGame['awayScore']} - {targetGame['homeScore']}")
 
-        print(targetGame["awayTeam"], "PLAYER STATS:")
-        for player in targetGame["playerStats"]:
-            if player["name"] in league.players:
-                if league.players[player["name"]].team == targetGame["awayTeam"]:
+        print(targetGame['awayTeam'], "PLAYER STATS:")
+        for player in targetGame['playerStats']:
+            if player['name'] in league.players:
+                if league.players[player['name']].team == targetGame['awayTeam']:
                     print(player)
         print("--------------------------------------------------")
 
-        print(targetGame["homeTeam"], "PLAYER STATS:")
-        for player in targetGame["playerStats"]:
-            if player["name"] in league.players:
-                if league.players[player["name"]].team == targetGame["homeTeam"]:
+        print(targetGame['homeTeam'], "PLAYER STATS:")
+        for player in targetGame['playerStats']:
+            if player['name'] in league.players:
+                if league.players[player['name']].team == targetGame['homeTeam']:
                     print(player)
         print("--------------------------------------------------")
 
         correct = input("Is this the correct game? (yes/no): ").upper()
         if correct == "YES":
             break
+        if correct == "NO":
+            continue
 
     playerName = input("Which player's stats would you like to edit? ").upper()
     playerStats = "x"
-    for player in targetGame["playerStats"]:
-        if player["name"] == playerName:
+    for player in targetGame['playerStats']:
+        if player['name'] == playerName:
             playerStats = player
             break
-    if playerStats is "x":
+    if playerStats == "x":
         print("Player not found in this game.")
         print("--------------------------------------------------")
         return
 
+    print("Editable Stats:")
+    for x in playerStats:
+        if x != "name":
+           print("-", x)
+    statToEdit = input("Which stat would you like to edit? ")
+    if statToEdit not in playerStats:
+        print("You can not edit this stat.")
+        print("--------------------------------------------------")
+        return
+
+    oldValue = playerStats[statToEdit]
+    newValue = int(input(f"Enter new value for {statToEdit}: "))
+    playerStats[statToEdit] = newValue
+
+    for gameStats in league.players[playerName].games:
+        if gameStats["atBats"] == oldValue:
+            gameStats[statToEdit] = newValue
+            break
+    print(f"{statToEdit} changed from {oldValue} to {newValue}")
+    print("--------------------------------------------------")
 
 
 
-########################################################################################################################
 
 
 
