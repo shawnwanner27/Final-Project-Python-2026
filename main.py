@@ -128,7 +128,8 @@ def addGame(league):
 
         game["playerStats"].append({"name": name, **stats})
         if name in league.players:
-            league.players[name].addGame(stats)
+            playerGameStats = {'date': game['date'], 'number': game['number'], **stats}
+            league.players[name].addGame(playerGameStats)
         else:
             print("Player not found.")
             print("--------------------------------------------------")
@@ -194,11 +195,11 @@ def teamRecord(league, team):
 def editGame(league):
     while True:
         targetDate = input("What day was the game you would like to edit? ")
-        targetGameNumber = input("What number game was it that day? ")
+        targetGameNumber = input("What number game was it that day (1st, 2nd, 3rd)? ")
         targetGame = "x"
 
         for game in league.games:
-            if game['date'] == targetDate and game.get['number'] == targetGameNumber:
+            if game['date'] == targetDate and game.get('number') == targetGameNumber:                                             #ASK WHY () AND NOT []
                 targetGame = game
                 break
         if targetGame == "x":
@@ -206,8 +207,10 @@ def editGame(league):
             print("--------------------------------------------------")
             continue
 
+        print("--------------------------------------------------")
         print(f"{targetGame['awayTeam']} vs {targetGame['homeTeam']}")
         print(f"Score: {targetGame['awayScore']} - {targetGame['homeScore']}")
+        print("--------------------------------------------------")
 
         print(targetGame['awayTeam'], "PLAYER STATS:")
         for player in targetGame['playerStats']:
@@ -250,15 +253,15 @@ def editGame(league):
         print("--------------------------------------------------")
         return
 
-    oldValue = playerStats[statToEdit]
     newValue = int(input(f"Enter new value for {statToEdit}: "))
     playerStats[statToEdit] = newValue
 
     for gameStats in league.players[playerName].games:
-        if gameStats["atBats"] == oldValue:
+        if (gameStats['date'] == targetDate and gameStats['number'] == targetGameNumber):
             gameStats[statToEdit] = newValue
+            playerStats[statToEdit] = newValue
             break
-    print(f"{statToEdit} changed from {oldValue} to {newValue}")
+    print(f"{statToEdit} changed from {playerStats[statToEdit]} to {newValue}")
     print("--------------------------------------------------")
 
 
