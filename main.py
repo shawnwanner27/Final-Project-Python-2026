@@ -107,7 +107,7 @@ def addGame(league):
         "awayScore": int(input("Away Score: ")),
         "playerStats": []}
 
-    numPlayers = int(input("How many player entries? "))
+    numPlayers = int(input("How many player entries?: "))
     print("--------------------------------------------------")
     for x in range(numPlayers):
         name = input("Player Name: ").upper()
@@ -194,12 +194,12 @@ def teamRecord(league, team):
 
 def editGame(league):
     while True:
-        targetDate = input("What day was the game you would like to edit? ")
-        targetGameNumber = input("What number game was it that day (1st, 2nd, 3rd)? ")
+        targetDate = input("What day was the game you would like to edit (mm/dd/yyyy)?: ")
+        targetGameNumber = input("What number game was it that day (1st, 2nd, 3rd)?: ")
         targetGame = "x"
 
         for game in league.games:
-            if game['date'] == targetDate and game.get('number') == targetGameNumber:                                             #ASK WHY () AND NOT []
+            if game['date'] == targetDate and game.get('number') == targetGameNumber:
                 targetGame = game
                 break
         if targetGame == "x":
@@ -232,7 +232,7 @@ def editGame(league):
         if correct == "NO":
             continue
 
-    playerName = input("Which player's stats would you like to edit? ").upper()
+    playerName = input("Which player's stats would you like to edit?: ").upper()
     playerStats = "x"
     for player in targetGame['playerStats']:
         if player['name'] == playerName:
@@ -247,13 +247,13 @@ def editGame(league):
     for x in playerStats:
         if x != "name":
            print("-", x)
-    statToEdit = input("Which stat would you like to edit? ")
+    statToEdit = input("Which stat would you like to edit?: ")
     if statToEdit not in playerStats:
         print("You can not edit this stat.")
         print("--------------------------------------------------")
         return
 
-    newValue = int(input(f"Enter new value for {statToEdit}: "))
+    newValue = int(input(f"Enter New Value for {statToEdit}: "))
     playerStats[statToEdit] = newValue
 
     for gameStats in league.players[playerName].games:
@@ -271,7 +271,7 @@ def editGame(league):
 
 
 def searchStats(league):
-    choice = input("Player or Team? ").lower()
+    choice = input("Player or Team?: ").lower()
 
     if choice == "player":
         name = input("Player Name: ").upper()
@@ -320,7 +320,7 @@ def searchStats(league):
 
 
 def showRosters(league):
-    choice = input("Which team would you like to see? ").upper()
+    choice = input("Which team would you like to see?: ").upper()
     if choice not in league.teams:
             print("Team not found.")
             print("--------------------------------------------------")
@@ -372,5 +372,7 @@ def main():
         league.save()
 
 
+print("--------------------------------------------------")
+print("Welcome to Daniel's Backyard Wiffleball database!\nEverything from team rosters to individual stats are stored here.\nAny data input WILL NOT SAVE unless you use the exit command in the menu.\nIf anything goes wrong just ask Shawn and hopefully he will be able to fix it.\nHappy Wiffling!")
 print("--------------------------------------------------")
 main()
