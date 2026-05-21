@@ -7,7 +7,6 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
 
-
 class Player:
     def __init__(self, name, team):
         self.name = name.upper()
@@ -50,7 +49,6 @@ class League:
         try:
             with open("stats.json", "r") as file:
                 data = json.load(file)
-
                 self.teams = data["teams"]
                 self.games = data["games"]
 
@@ -58,7 +56,6 @@ class League:
                     y = Player(name, x["team"])
                     y.games = x["games"]
                     self.players[name] = y
-
         except:
             pass
 
@@ -95,21 +92,12 @@ def walkPercent(x):
     return x["walks"] / x["atBats"] if x["atBats"] else 0
 
 
-def pitchingStrikesPercent(x):
-    return x["pitchingStrikes"] / x["pitchCount"] if x["pitchCount"] else 0
-
-
-def pitchingWalkPercent(x):
-    return x["pitchingBalls"] / x["pitchCount"] if x["pitchCount"] else 0
-
-
 def teamTotals(league, team):
     totals = {}
 
     for playerName in league.teams[team]:
         player = league.players[playerName]
         playerTotals = player.getTotals()
-
         for x, y in playerTotals.items():
             totals[x] = totals.get(x, 0) + y
     return totals
@@ -131,66 +119,55 @@ def teamRecord(league, team):
 
 
 
-
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-
         self.league = League()
 
         self.title("Daniel's Backyard Wiffleball Database")
         self.geometry("1200x800")
-
         title = ctk.CTkLabel(
             self,
             text="Daniel's Backyard Wiffleball Database",
             font=("Arial", 28, "bold"))
         title.pack(pady=20)
-
         buttonFrame = ctk.CTkFrame(self)
         buttonFrame.pack(pady=10)
 
-        ctk.CTkButton(
-            buttonFrame,
-            text="Create Team",
-            command=self.createTeamWindow,
-            width=180
-        ).grid(row=0, column=0, padx=10, pady=10)
+        exitButton = ctk.CTkButton(
+            self,
+            text="X",
+            width=40,
+            height=40,
+            fg_color="darkred",
+            hover_color="red",
+            font=("Arial", 20, "bold"),
+            command=self.onClose)
+        exitButton.place(relx=0.98, rely=0.02, anchor="ne")
 
-        ctk.CTkButton(
-            buttonFrame,
-            text="Create Player",
-            command=self.createPlayerWindow,
-            width=180
-        ).grid(row=0, column=1, padx=10, pady=10)
+        ctk.CTkButton(buttonFrame, text="Create Team",
+                      command=self.createTeamWindow,
+                      width=180).grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-        ctk.CTkButton(
-            buttonFrame,
-            text="Add Game",
-            command=self.addWindow,
-            width=180
-        ).grid(row=0, column=2, padx=10, pady=10)
+        ctk.CTkButton(buttonFrame, text="Create Player",
+                      command=self.createPlayerWindow,
+                      width=180).grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
-        ctk.CTkButton(
-            buttonFrame,
-            text="Edit Game",
-            command=self.editWindow,
-            width=180
-        ).grid(row=1, column=0, padx=10, pady=10)
+        ctk.CTkButton(buttonFrame, text="Add Game",
+                      command=self.addWindow,
+                      width=180).grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
 
-        ctk.CTkButton(
-            buttonFrame,
-            text="Search Stats",
-            command=self.searchStatsWindow,
-            width=180
-        ).grid(row=1, column=1, padx=10, pady=10)
+        ctk.CTkButton(buttonFrame, text="Edit Game",
+                      command=self.editWindow,
+                      width=180).grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
-        ctk.CTkButton(
-            buttonFrame,
-            text="Show Rosters",
-            command=self.showRosterWindow,
-            width=180
-        ).grid(row=1, column=2, padx=10, pady=10)
+        ctk.CTkButton(buttonFrame, text="Search Stats",
+                      command=self.searchStatsWindow,
+                      width=180).grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
+
+        ctk.CTkButton(buttonFrame, text="Show Rosters",
+                      command=self.showRosterWindow,
+                      width=180).grid(row=1, column=2, padx=10, pady=10, sticky="nsew")
 
         self.output = ScrolledText(
             self,
@@ -199,11 +176,22 @@ class App(ctk.CTk):
             insertbackground="white",
             font=("Consolas", 12))
         self.output.pack(fill="both", expand=True, padx=20, pady=20)
-
         self.log("Welcome to Daniel's Backyard Wiffleball Database!")
-
         self.protocol("WM_DELETE_WINDOW", self.onClose)
 
+
+    def make_popup(self, title, geometry):
+        window = ctk.CTkToplevel(self)
+        window.title(title)
+        window.geometry(geometry)
+        window.attributes("-topmost", True)
+        window.lift()
+        window.update()
+        window.attributes("-topmost", False)
+
+        window.focus_force()
+        window.grab_set()
+        return window
 
 
     def log(self, text):
@@ -212,9 +200,7 @@ class App(ctk.CTk):
 
 
     def createTeamWindow(self):
-        window = ctk.CTkToplevel(self)
-        window.title("Create Team")
-        window.geometry("300x200")
+        window = self.make_popup("Create Team", "300x200")
 
         ctk.CTkLabel(window, text="Team Name").pack(pady=10)
         teamEntry = ctk.CTkEntry(window)
@@ -232,11 +218,8 @@ class App(ctk.CTk):
             window.destroy()
         ctk.CTkButton(window, text="Create", command=submit).pack(pady=20)
 
-
     def createPlayerWindow(self):
-        window = ctk.CTkToplevel(self)
-        window.title("Create Player")
-        window.geometry("400x300")
+        window = self.make_popup("Create Player", "400x300")
 
         ctk.CTkLabel(window, text="Player Name").pack(pady=5)
         nameEntry = ctk.CTkEntry(window)
@@ -249,6 +232,7 @@ class App(ctk.CTk):
         def submit():
             name = nameEntry.get().upper()
             team = teamEntry.get().upper()
+
             if team not in self.league.teams:
                 messagebox.showerror("Error", "Team does not exist.")
                 return
@@ -261,16 +245,12 @@ class App(ctk.CTk):
             window.destroy()
         ctk.CTkButton(window, text="Create", command=submit).pack(pady=20)
 
-
     def addWindow(self):
-        window = ctk.CTkToplevel(self)
-        window.title("Add Game")
-        window.geometry("600x900")
+        window = self.make_popup("Add Game", "600x900")
         entries = {}
-
         fields = [
             "Date (mm/dd/yyyy)",
-            "Number (1st,2nd,3rd)",
+            "Number (1st, 2nd, 3rd)",
             "Home Team Name",
             "Away Team Name",
             "Home Team Score",
@@ -284,9 +264,8 @@ class App(ctk.CTk):
 
         ctk.CTkLabel(
             window,
-            text="Player Stats Format:\nName,AtBats,Hits,Walks,StrickOuts,1B,2B,3B,HR,PCount,PStrike,PBall,PHits",
-            font=("Arial", 12)
-        ).pack(pady=10)
+            text="Player Stats Format (No Spaces and One Line Per Player):\nName,AtBats,Hits,Walks,StrikeOuts,1B,2B,3B,HR,PCount,PStrike,PBall,PHits",
+            font=("Arial", 12)).pack(pady=10)
 
         playerText = ctk.CTkTextbox(window, height=300)
         playerText.pack(fill="both", expand=True, padx=20)
@@ -324,33 +303,24 @@ class App(ctk.CTk):
                 game["playerStats"].append({"name": name, **stats})
 
                 if name in self.league.players:
-                    playerGameStats = {
+                    self.league.players[name].addGame({
                         "date": game["date"],
                         "number": game["number"],
-                        **stats}
+                        **stats})
 
-                    self.league.players[name].addGame(playerGameStats)
             self.league.games.append(game)
             self.league.save()
-            self.log(
-                f"Game added: "
-                f"{game['awayTeam']} vs {game['homeTeam']}")
-
+            self.log(f"Game added: {game['awayTeam']} vs {game['homeTeam']}")
             window.destroy()
         ctk.CTkButton(window, text="Add Game", command=submit).pack(pady=20)
 
-
-
     def editWindow(self):
-        window = ctk.CTkToplevel(self)
-        window.title("Edit Game")
-        window.geometry("500x500")
-
-        ctk.CTkLabel(window, text="Game Date (mm/dd/yyyy)").pack()
+        window = self.make_popup("Edit Game", "500x500")
+        ctk.CTkLabel(window, text="Game Date").pack()
         dateEntry = ctk.CTkEntry(window)
         dateEntry.pack()
 
-        ctk.CTkLabel(window, text="Game Number (1st,2nd,3rd)").pack()
+        ctk.CTkLabel(window, text="Game Number").pack()
         numberEntry = ctk.CTkEntry(window)
         numberEntry.pack()
 
@@ -375,52 +345,41 @@ class App(ctk.CTk):
 
             targetGame = None
             for game in self.league.games:
-                if (game["date"] == targetDate and game["number"] == targetGameNumber):
+                if game["date"] == targetDate and game["number"] == targetGameNumber:
                     targetGame = game
                     break
 
-            if targetGame is None:
+            if not targetGame:
                 messagebox.showerror("Error", "Game not found.")
                 return
-            playerStats = None
 
+            playerStats = None
             for player in targetGame["playerStats"]:
                 if player["name"] == playerName:
                     playerStats = player
                     break
 
-            if playerStats is None:
-                messagebox.showerror(
-                    "Error",
-                    "Player not found in game.")
+            if not playerStats:
+                messagebox.showerror("Error", "Player not found in game.")
                 return
 
             if statToEdit not in playerStats:
-                messagebox.showerror(
-                    "Error",
-                    "Invalid stat.")
+                messagebox.showerror("Error", "Invalid stat.")
                 return
-            oldValue = playerStats[statToEdit]
-            playerStats[statToEdit] = newValue
 
+            playerStats[statToEdit] = newValue
             for gameStats in self.league.players[playerName].games:
-                if (gameStats["date"] == targetDate and gameStats["number"] == targetGameNumber):
+                if gameStats["date"] == targetDate and gameStats["number"] == targetGameNumber:
                     gameStats[statToEdit] = newValue
                     break
 
             self.league.save()
-            self.log(
-                f"{playerName} | {statToEdit}: "
-                f"{oldValue} -> {newValue}")
+            self.log(f"{playerName} updated {statToEdit}")
             window.destroy()
         ctk.CTkButton(window, text="Edit", command=submit).pack(pady=20)
 
-
     def searchStatsWindow(self):
-        window = ctk.CTkToplevel(self)
-        window.title("Search Stats")
-        window.geometry("400x300")
-
+        window = self.make_popup("Search Stats", "400x300")
         ctk.CTkLabel(window, text="Player or Team").pack()
         typeEntry = ctk.CTkEntry(window)
         typeEntry.pack()
@@ -432,51 +391,38 @@ class App(ctk.CTk):
         def submit():
             choice = typeEntry.get().lower()
             name = nameEntry.get().upper()
-            self.log("")
 
             if choice == "player":
                 if name not in self.league.players:
                     self.log("Player not found.")
                     return
 
-                player = self.league.players[name]
-                stat = player.getTotals()
+                stat = self.league.players[name].getTotals()
                 self.log(f"{name} STATS")
                 self.log(f"Batting Avg: {round(battingAvg(stat), 3)}")
                 self.log(f"OBP: {round(onBasePercent(stat), 3)}")
-                self.log(f"Strikeout %: {round(strikeoutPercent(stat), 3)}")
-                self.log(f"Walk %: {round(walkPercent(stat), 3)}")
-                self.log(f"HRs: {stat['homeRuns']}")
 
             elif choice == "team":
                 if name not in self.league.teams:
                     self.log("Team not found.")
                     return
+
                 totals = teamTotals(self.league, name)
                 wins, losses = teamRecord(self.league, name)
-
                 self.log(f"{name} TEAM STATS")
                 self.log(f"Record: {wins}-{losses}")
-                self.log(
-                    f"Batting Avg: "
-                    f"{round(battingAvg(totals), 3)}")
-                self.log(
-                    f"OBP: "
-                    f"{round(onBasePercent(totals), 3)}")
             window.destroy()
         ctk.CTkButton(window, text="Search", command=submit).pack(pady=20)
 
-
     def showRosterWindow(self):
-        window = ctk.CTkToplevel(self)
-        window.title("Show Rosters")
-        window.geometry("300x300")
+        window = self.make_popup("Show Rosters", "300x300")
         ctk.CTkLabel(window, text="Team Name").pack(pady=10)
         teamEntry = ctk.CTkEntry(window)
         teamEntry.pack(pady=10)
 
         def submit():
             team = teamEntry.get().upper()
+
             if team not in self.league.teams:
                 self.log("Team not found.")
                 return
@@ -484,15 +430,12 @@ class App(ctk.CTk):
             self.log(f"{team} ROSTER")
             for player in self.league.teams[team]:
                 self.log(player)
-            self.log("")
             window.destroy()
         ctk.CTkButton(window, text="Show", command=submit).pack(pady=20)
-
 
     def onClose(self):
         self.league.save()
         self.destroy()
-
 
 
 app = App()
